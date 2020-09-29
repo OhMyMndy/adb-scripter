@@ -27,4 +27,4 @@ sudo apt install ansible -y
 ## Build image locally
 
 - Run `make buildx`
-- Import the image on the target machine through ssh `docker save ohmymndy/adb-scripter:latest_arm32v6 | ssh <user@host> docker load`
+- Image image on the remote machine `make HOST=<user@hostname> deploy-image`

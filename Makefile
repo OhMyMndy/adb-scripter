@@ -1,4 +1,4 @@
-IMAGE_NAME = ohmymndy/adb-scripter:latest 
+IMAGE_NAME = ohmymndy/adb-scripter:latest
 PROJECT_NAME = adb-scripter
 
 build:
@@ -24,3 +24,6 @@ run-udevadm:
 
 deploy:
 	ansible-playbook ansible/local.yml -k -i $(IP),
+
+deploy-image: buildx
+	docker save $(IMAGE_NAME)_arm32v6 | ssh $(HOST) docker load
