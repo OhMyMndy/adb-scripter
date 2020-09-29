@@ -1,26 +1,32 @@
 IMAGE_NAME = ohmymndy/adb-scripter:latest
 PROJECT_NAME = adb-scripter
 
+ANDROID_VOLUME = $$HOME/.android:/root/.android
+
+#DOCKER_RUN_OPTS = --network host --init 
+DOCKER_RUN_OPTS = --init 
+
 build:
-	docker build --build-arg $(shell cat .arch 2>/dev/null || echo 'A=') -t $(IMAGE_NAME) .
+	docker build --build-arg $(shell cat .arch 2>/dev/null || echo 'A=') -t $(IMAGE_NAME)$(IMAGE_NAME_ARCH) .
 
 buildx:
 	 docker buildx build --load --build-arg ARCH=arm32v5/ --platform linux/arm32v6 -t $(IMAGE_NAME)_arm32v6 .
 
 run: destroy
-	docker run --rm -it --init --name $(PROJECT_NAME) -v /dev:/dev:ro $(IMAGE_NAME) 
+	docker run --rm -it $(DOCKER_RUN_OPTS) --name $(PROJECT_NAME) -v "$(ANDROID_VOLUME)" -v /dev:/dev:ro $(IMAGE_NAME)$(IMAGE_NAME_ARCH)
 
 destroy:
 	docker kill $(PROJECT_NAME) || true
+	docker rm $(PROJECT_NAME) || true
 
 run-with-restart: destroy
-	docker run -d --init --name $(PROJECT_NAME) --restart unless-stopped -v /dev:/dev:ro $(IMAGE_NAME)
+	docker run -d $(DOCKER_RUN_OPTS) --name $(PROJECT_NAME) --restart unless-stopped -v "$(ANDROID_VOLUME)" -v /dev:/dev:ro $(IMAGE_NAME)$(IMAGE_NAME_ARCH)
 
 run-shell:
-	docker run --rm --init -it -v /dev:/dev:ro $(IMAGE_NAME) ash
+	docker run --rm $(DOCKER_RUN_OPTS) -it -v "$(ANDROID_VOLUME)" -v /dev:/dev:ro $(IMAGE_NAME)$(IMAGE_NAME_ARCH) ash
 
 run-udevadm:
-	docker run --rm --init -it -v /dev:/dev:ro $(IMAGE_NAME) udevadm monitor -p
+	docker run --rm $(DOCKER_RUN_OPTS) -it -v "$(ANDROID_VOLUME)" -v /dev:/dev:ro $(IMAGE_NAME)$(IMAGE_NAME_ARCH) udevadm monitor -p
 
 deploy:
 	ansible-playbook ansible/local.yml -k -i $(IP),

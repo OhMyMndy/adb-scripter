@@ -3,18 +3,18 @@
   user: root
 
   tasks:
-  - name: Install Docker CE
-    shell: |
-      curl -fsSL https://get.docker.com | bash
-  - name: Install OS packages
-    package:
-      name:
-        - make
-        - rsync
-        - time
-        - less
-        - udev
-      state: latest
+  # - name: Install Docker CE
+  #   shell: |
+  #     curl -fsSL https://get.docker.com | bash
+  # - name: Install OS packages
+  #   package:
+  #     name:
+  #       - make
+  #       - rsync
+  #       - time
+  #       - less
+  #       - udev
+  #     state: latest
 
 
 
@@ -28,5 +28,5 @@
   - name: Build and start application
     shell: |
       cd /adb-scripter
-      make build
-      make run-with-restart
+      make IMAGE_NAME_ARCH=_arm32v6 build
+      make IMAGE_NAME_ARCH=_arm32v6 run-with-restart
