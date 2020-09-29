@@ -1,0 +1,20 @@
+FROM alpine@sha256:71465c7d45a086a2181ce33bb47f7eaef5c233eace65704da0c5e5454a79cee5
+
+RUN apk add --no-cache python3 py3-pip eudev supervisor
+
+# ADB start-server gives errors on arm32v6
+RUN apk add --no-cache android-tools --repository=http://dl-cdn.alpinelinux.org/alpine/edge/testing
+
+RUN pip3 install pure-python-adb
+RUN pip3 install pyudev
+
+COPY ./bin /adb-scripter/bin
+COPY ./config /adb-scripter/config
+COPY ./src /adb-scripter/src
+
+COPY ./config/supervisord.conf /etc/supervisord.conf
+
+
+
+
+CMD /usr/bin/supervisord -c /etc/supervisord.conf
