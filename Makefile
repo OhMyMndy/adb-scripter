@@ -1,19 +1,26 @@
+IMAGE_NAME = ohmymndy/adb-scripter:latest 
+PROJECT_NAME = adb-scripter
+
 build:
-	docker build --build-arg $(shell cat .arch 2>/dev/null) -t ohmymndy/adb-scripter:latest .
+	docker build --build-arg $(shell cat .arch 2>/dev/null || echo 'A=') -t $(IMAGE_NAME) .
 
 buildx:
-	 docker buildx build --build-arg ARCH=arm32v5/ --platform linux/arm32v6 -t ohmymndy/adb-scripter:latest_arm32v6 .
+	 docker buildx build --load --build-arg ARCH=arm32v5/ --platform linux/arm32v6 -t $(IMAGE_NAME)_arm32v6 .
 
-run:
-	docker run --rm -it -v /dev:/dev:ro ohmymndy/adb-scripter:latest 
+run: destroy
+	docker run --rm -it --init --name $(PROJECT_NAME) -v /dev:/dev:ro $(IMAGE_NAME) 
 
-run-with-restart:
-	docker stop adb-scripter || true
-	docker kill adb-scripter || true
-	docker run -d --init --name adb-scripter --restart unless-stopped -v /dev:/dev:ro ohmymndy/adb-scripter:latest
+destroy:
+	docker kill $(PROJECT_NAME) || true
+
+run-with-restart: destroy
+	docker run -d --init --name $(PROJECT_NAME) --restart unless-stopped -v /dev:/dev:ro $(IMAGE_NAME)
 
 run-shell:
-	docker run --rm --init -it -v /dev:/dev:ro ohmymndy/adb-scripter:latest ash
+	docker run --rm --init -it -v /dev:/dev:ro $(IMAGE_NAME) ash
 
 run-udevadm:
-	docker run --rm --init -it -v /dev:/dev:ro ohmymndy/adb-scripter:latest udevadm monitor -p
+	docker run --rm --init -it -v /dev:/dev:ro $(IMAGE_NAME) udevadm monitor -p
+
+deploy:
+	ansible-playbook ansible/local.yml -k -i $(IP),

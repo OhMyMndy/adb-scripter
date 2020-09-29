@@ -1,9 +1,10 @@
 ARG ARCH=
 FROM ${ARCH}debian
 
-#FROM ubuntu:20.04
-
-RUN apt-get update -qq && apt-get install -y -qq python3 python3-pip supervisor android-tools-adb
+RUN apt-get update -qq \
+    && apt-get install -y -qq  --no-install-recommends python3-setuptools python3 python3-pip supervisor android-tools-adb udev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pip3 install pure-python-adb
 RUN pip3 install pyudev

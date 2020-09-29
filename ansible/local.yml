@@ -1,18 +1,20 @@
 - hosts: all
   become: no
+  user: root
 
   tasks:
-  # - name: Install Docker CE
-  #   shell: |
-  #     curl -fsSL https://get.docker.com | bash
-  # - name: Install OS packages
-  #   package:
-  #     name:
-  #       - make
-  #       - rsync
-  #       - time
-  #       - less
-  #     state: latest
+  - name: Install Docker CE
+    shell: |
+      curl -fsSL https://get.docker.com | bash
+  - name: Install OS packages
+    package:
+      name:
+        - make
+        - rsync
+        - time
+        - less
+        - udev
+      state: latest
 
 
 
@@ -26,9 +28,5 @@
   - name: Build and start application
     shell: |
       cd /adb-scripter
-      rm .arch
-      if lscpu | grep armv6l &>/dev/null; then
-        echo "ARCH=arm32v5/" > .arch
-      fi
       make build
       make run-with-restart
