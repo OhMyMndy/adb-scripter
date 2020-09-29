@@ -1,0 +1,28 @@
+- hosts: all
+  become: no
+  vars:
+    pip_install_packages:
+      - name: docker
+
+  roles:
+    - geerlingguy.pip
+    - geerlingguy.docker
+
+  tasks:
+
+  - name: Install OS packages
+    package:
+      name:
+        - make
+      state: latest
+
+
+  - name: Git checkout
+    git:
+      repo: 'https://github.com/ohmymndy/adb-scripter.git'
+      dest: /adb-scripter
+
+  - name: Build and start application
+    shell: |
+      make build
+      make run-with-restart

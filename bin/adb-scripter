@@ -1,0 +1,24 @@
+#!/usr/bin/env python3
+
+
+def handle_udev(device):
+    print('{0} is located on {1} {2} {3} {4}'.format(device.device_node, device.parent.device_node, vars(device.tags), device.device_number, vars(device.attributes)))
+
+
+from ppadb.client import Client as AdbClient
+client = AdbClient(host="127.0.0.1", port=5037)
+print(client.version())
+
+
+import pyudev
+
+context = pyudev.Context()
+
+monitor = pyudev.Monitor.from_netlink(context)
+monitor.filter_by('usb_device')
+
+for device in context.list_devices(subsystem='usb', DEVTYPE='usb_device'):
+    handle_udev(device)
+
+for device in iter(monitor.poll, None):
+    handle_udev(device)
