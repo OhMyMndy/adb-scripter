@@ -16,6 +16,5 @@ COPY ./src /adb-scripter/src
 COPY ./config/supervisord.conf /etc/supervisord.conf
 
 
-
-
-CMD /usr/bin/supervisord -c /etc/supervisord.conf
+ENV PYTHONUNBUFFERED=True
+CMD /usr/bin/supervisord -n -c /etc/supervisord.conf
